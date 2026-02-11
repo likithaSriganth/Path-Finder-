@@ -226,7 +226,7 @@ function CareerCard({ path, index }: { path: CareerPath; index: number }) {
                             </h4>
                             <p className="text-xs text-slate-500 mt-1">{resource.provider}</p>
                           </div>
-                          <a href={resource.url} className="text-slate-300 hover:text-indigo-500 transition-colors">
+                          <a href={resource.url} target="_blank" rel="noopener noreferrer" className="text-slate-300 hover:text-indigo-500 transition-colors">
                             <ExternalLink className="h-5 w-5" />
                           </a>
                         </div>

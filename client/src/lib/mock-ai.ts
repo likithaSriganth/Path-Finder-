@@ -7,7 +7,7 @@ export type Resource = {
   provider: string;
   duration?: string;
   rating?: number;
-  url: "#";
+  url: string;
   reason: string; // Explainable AI part
 };
 
@@ -34,158 +34,140 @@ export type CareerPath = {
 
 // Mock AI Service
 export const generateCareerPaths = async (
-  userProfile: { name: string; skills: string[]; interests: string[] }
+  userProfile: { name: string; skills: string[]; experience?: string }
 ): Promise<CareerPath[]> => {
   // Simulate network delay for "AI Processing"
   await new Promise((resolve) => setTimeout(resolve, 1500));
 
-  // In a real app, this would call an LLM. Here we return hardcoded "personalized" data.
-  return [
-    {
-      id: "cp_1",
-      title: "AI Ethics Specialist",
-      matchScore: 94,
-      description: "Ensure artificial intelligence systems are developed and deployed responsibly, focusing on fairness, transparency, and accountability.",
-      salaryRange: "$110k - $165k",
-      growthOutlook: "High",
-      skillsGap: ["Regulatory Frameworks", "Bias Auditing"],
-      reasoning: {
-        strengths: [
-          `Your background in ${userProfile.skills[0] || "Analysis"} provides a strong foundation for auditing complex systems.`,
-          "Your interest in societal impact aligns perfectly with the ethical dimensions of this role.",
-        ],
-        opportunities: [
-          "Emerging regulations (EU AI Act) are creating massive demand for compliance experts.",
-        ],
-        marketFit: "As AI adoption scales, the need for governance is outpacing the supply of qualified professionals.",
-      },
-      roadmap: [
-        {
-          phase: "Foundation",
-          duration: "1-3 Months",
-          steps: ["Master AI fundamentals", "Study ethical frameworks (Utilitarianism, Deontology)"],
-        },
-        {
-          phase: "Specialization",
-          duration: "3-6 Months",
-          steps: ["Learn algorithmic bias detection techniques", "Certification in Data Privacy (CIPP/E)"],
-        },
+  const userSkills = userProfile.skills.length > 0 ? userProfile.skills : ["Analysis", "Technology"];
+  const primarySkill = userSkills[0];
+  const secondarySkill = userSkills[1] || "Problem Solving";
+
+  // Dynamic logic to make suggestions feel "accurate" based on user data
+  const isTechnical = userSkills.some(s => /coding|dev|engineering|software|technical/i.test(s));
+  const isCreative = userSkills.some(s => /design|creative|art|writing/i.test(s));
+  const isBusiness = userSkills.some(s => /management|business|marketing|strategy/i.test(s));
+
+  const paths: CareerPath[] = [];
+
+  // Suggestion 1: The "Best Match"
+  paths.push({
+    id: "cp_1",
+    title: isTechnical ? "AI Engineering Lead" : isCreative ? "Creative Technologist" : "Strategic Operations Director",
+    matchScore: 96,
+    description: `A senior leadership role that leverages your expertise in ${primarySkill} to drive innovation and efficiency.`,
+    salaryRange: "$140k - $210k",
+    growthOutlook: "High",
+    skillsGap: ["Systems Architecture", "Executive Presence"],
+    reasoning: {
+      strengths: [
+        `Your proficiency in ${primarySkill} is a core requirement for this high-impact role.`,
+        `The intersection of ${secondarySkill} and your previous experience makes you a unique candidate.`,
       ],
-      resources: [
-        {
-          id: "r1",
-          title: "Practical AI Ethics for Data Professionals",
-          type: "course",
-          provider: "Coursera",
-          rating: 4.8,
-          duration: "4 weeks",
-          url: "#",
-          reason: "Directly addresses your skill gap in Bias Auditing with hands-on labs.",
-        },
-        {
-          id: "r2",
-          title: "Weapons of Math Destruction",
-          type: "book",
-          provider: "Cathy O'Neil",
-          rating: 4.9,
-          url: "#",
-          reason: "Foundational reading to understand the societal impact of algorithmic decision making.",
-        },
+      opportunities: [
+        "Major companies are currently restructuring around AI, seeking candidates with your exact blend of skills.",
       ],
+      marketFit: "Extremely high demand with a significant shortage of candidates who understand both the technical and business sides.",
     },
-    {
-      id: "cp_2",
-      title: "Product Manager (Technical)",
-      matchScore: 88,
-      description: "Lead the development of technical products, bridging the gap between engineering teams and business requirements.",
-      salaryRange: "$130k - $190k",
-      growthOutlook: "Stable",
-      skillsGap: ["Agile Methodologies", "Stakeholder Management"],
-      reasoning: {
-        strengths: [
-          `Your detailed understanding of ${userProfile.skills[1] || "Technology"} allows you to communicate effectively with engineers.`,
-          "You show aptitude for strategic thinking based on your project history.",
-        ],
-        opportunities: [
-          "Technical PMs are increasingly vital in API-first and platform companies.",
-        ],
-        marketFit: "Consistently high demand, though competitive at entry level.",
+    roadmap: [
+      { phase: "Upskilling", duration: "3 Months", steps: ["Advanced Systems Design", "Leadership Workshop"] },
+      { phase: "Networking", duration: "2 Months", steps: ["Attend Industry Summits", "Engage with Executive Search Firms"] }
+    ],
+    resources: [
+      {
+        id: "r1",
+        title: "Systems Design for Scale",
+        type: "course",
+        provider: "Educative",
+        url: "https://www.educative.io/courses/grokking-modern-system-design-interview-for-engineers-managers",
+        reason: `Directly addresses your skill gap in Architecture to support your ${primarySkill} background.`
       },
-      roadmap: [
-        {
-          phase: "Transition",
-          duration: "2-4 Months",
-          steps: ["Build a side project to practice end-to-end delivery", "Study product metrics and KPIs"],
-        },
-        {
-          phase: "Growth",
-          duration: "6-12 Months",
-          steps: ["Lead a cross-functional team", "Advanced Scrum Master certification"],
-        },
+      {
+        id: "r2",
+        title: "The Effective Executive",
+        type: "book",
+        provider: "Peter Drucker",
+        url: "https://www.amazon.com/Effective-Executive-Definitive-Guide-Getting/dp/0060833459",
+        reason: "Essential for developing the executive presence identified as an opportunity area."
+      }
+    ]
+  });
+
+  // Suggestion 2: The "Emerging Field"
+  paths.push({
+    id: "cp_2",
+    title: isTechnical ? "Data Privacy Architect" : isCreative ? "AI Content Strategist" : "Sustainability Consultant",
+    matchScore: 89,
+    description: "Navigate the complex landscape of emerging regulations and technologies to ensure ethical and sustainable growth.",
+    salaryRange: "$120k - $175k",
+    growthOutlook: "High",
+    skillsGap: ["Compliance Frameworks", "Stakeholder Communication"],
+    reasoning: {
+      strengths: [
+        `Your analytical approach to ${primarySkill} translates perfectly to regulatory compliance.`,
+        "You have shown a keen interest in forward-looking industries."
       ],
-      resources: [
-        {
-          id: "r3",
-          title: "Inspired: How to Create Tech Products Customers Love",
-          type: "book",
-          provider: "Marty Cagan",
-          rating: 4.9,
-          url: "#",
-          reason: "The industry standard for modern product management mindset.",
-        },
-        {
-          id: "r4",
-          title: "Product Strategy Metrics",
-          type: "article",
-          provider: "Reforge",
-          duration: "15 min read",
-          url: "#",
-          reason: "Helps you quantify success, a key requirement for senior PM roles.",
-        },
+      opportunities: [
+        "New international standards are creating a surge in consulting opportunities."
       ],
+      marketFit: "A rapidly growing sector with high barriers to entry, ensuring long-term job security."
     },
-    {
-      id: "cp_3",
-      title: "Data Visualization Engineer",
-      matchScore: 82,
-      description: "Create compelling visual narratives from complex datasets to help organizations make data-driven decisions.",
-      salaryRange: "$100k - $150k",
-      growthOutlook: "High",
-      skillsGap: ["D3.js", "Storytelling"],
-      reasoning: {
-        strengths: [
-          "Strong analytical skills combined with an eye for design.",
-          "Ability to simplify complex concepts.",
-        ],
-        opportunities: [
-          "Business Intelligence tools are becoming ubiquitous, requiring custom viz layers.",
-        ],
-        marketFit: "Niche but highly valued role in big tech and finance.",
+    roadmap: [
+      { phase: "Certification", duration: "4 Months", steps: ["Obtain Industry Credentials", "Study Regional Regulations"] }
+    ],
+    resources: [
+      {
+        id: "r3",
+        title: "Global Privacy Fundamentals",
+        type: "course",
+        provider: "IAPP",
+        url: "https://iapp.org/train/privacy-training-for-your-organization/",
+        reason: "Provides the necessary foundation for the compliance framework gap."
       },
-      roadmap: [
-        {
-          phase: "Skill Up",
-          duration: "1-2 Months",
-          steps: ["Master SVG and Canvas APIs", "Learn color theory for data"],
-        },
-        {
-          phase: "Portfolio",
-          duration: "3 Months",
-          steps: ["Recreate famous visualizations", "Publish a dashboard using public datasets"],
-        },
+      {
+        id: "r4",
+        title: "Future of Digital Ethics",
+        type: "article",
+        provider: "Harvard Business Review",
+        url: "https://hbr.org/topic/ethics",
+        reason: "Helps align your strategic thinking with upcoming market shifts."
+      }
+    ]
+  });
+
+  // Suggestion 3: The "Pivot"
+  paths.push({
+    id: "cp_3",
+    title: isTechnical ? "Solutions Architect" : isCreative ? "Experience Designer" : "Product Marketing Manager",
+    matchScore: 84,
+    description: "Synthesize customer needs with technical/creative capabilities to deliver superior value.",
+    salaryRange: "$110k - $160k",
+    growthOutlook: "Stable",
+    skillsGap: ["User Research", "Market Segmentation"],
+    reasoning: {
+      strengths: [
+        `Your ability to explain ${secondarySkill} concepts is vital for client-facing roles.`,
+        "Strong portfolio of successful projects."
       ],
-      resources: [
-        {
-          id: "r5",
-          title: "Fullstack D3 and Data Visualization",
-          type: "course",
-          provider: "Wattenberger",
-          rating: 5.0,
-          duration: "Self-paced",
-          url: "#",
-          reason: "Best-in-class interactive learning for your specific technical gap.",
-        },
+      opportunities: [
+        "Tech-adjacent roles are seeing higher wage growth than pure execution roles."
       ],
+      marketFit: "Steady demand across all sectors as companies seek to humanize their digital products."
     },
-  ];
+    roadmap: [
+      { phase: "Portfolio Shift", duration: "2 Months", steps: ["Case Study Development", "Soft Skills Training"] }
+    ],
+    resources: [
+      {
+        id: "r5",
+        title: "Product Strategy & Market Fit",
+        type: "course",
+        provider: "Reforge",
+        url: "https://www.reforge.com/programs/product-strategy",
+        reason: "Crucial for mastering the market segmentation skill gap."
+      }
+    ]
+  });
+
+  return paths;
 };

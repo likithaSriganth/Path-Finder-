@@ -36,8 +36,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       </nav>
 
       <div className="hidden md:flex ml-6 gap-2">
-        <Button variant="outline" className="glass-card hover:bg-white/90">Sign In</Button>
-        <Button className="bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20">Get Started</Button>
+        <Link href="/onboarding">
+          <Button variant="outline" className="glass-card hover:bg-white/90">Sign In</Button>
+        </Link>
+        <Link href="/onboarding">
+          <Button className="bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20">Get Started</Button>
+        </Link>
       </div>
     </>
   );
