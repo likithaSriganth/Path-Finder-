@@ -1,36 +1,22 @@
-import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { User, Settings, LogOut } from "lucide-react";
+import { User, Settings } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function Profile() {
-  const [profile, setProfile] = useState<any>(null);
+  const { user } = useAuth();
   const [, setLocation] = useLocation();
 
-  useEffect(() => {
-    const saved = localStorage.getItem("userProfile");
-    if (saved) {
-      setProfile(JSON.parse(saved));
-    }
-  }, []);
-
-  const handleLogout = () => {
-    localStorage.removeItem("userProfile");
-    setLocation("/");
-  };
-
-  if (!profile) {
-    return (
-      <div className="flex h-[80vh] items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold mb-4">No Profile Found</h2>
-          <Button asChild><a href="/onboarding">Create Profile</a></Button>
-        </div>
-      </div>
-    );
+  if (!user) {
+    return null; // ProtectedRoute will handle redirect
   }
+
+  // Parse skills if it's a string
+  const skills = typeof user.skills === "string" 
+    ? user.skills.split(",").map(s => s.trim()).filter(Boolean)
+    : [];
 
   return (
     <div className="container mx-auto px-4 py-12 max-w-3xl">
@@ -43,43 +29,36 @@ export default function Profile() {
                 <User className="h-10 w-10" />
               </div>
             </div>
-            <Button variant="outline" size="sm" onClick={() => setLocation("/onboarding")}>
-              <Settings className="h-4 w-4 mr-2" />
-              Edit Profile
-            </Button>
           </div>
 
           <div className="space-y-6">
             <div>
-              <h1 className="text-3xl font-display font-bold text-slate-900">{profile.name}</h1>
-              <p className="text-slate-500">Aspiring Professional</p>
+              <h1 className="text-3xl font-display font-bold text-slate-900">{user.name}</h1>
+              <p className="text-slate-500">@{user.username}</p>
             </div>
 
             <div className="grid gap-6">
               <div className="bg-white/50 p-6 rounded-xl border border-white/60">
-                <h3 className="font-semibold text-slate-900 mb-3">About</h3>
-                <p className="text-slate-600 leading-relaxed">
-                  {profile.experience || "No experience details added yet."}
+                <h3 className="font-semibold text-slate-900 mb-3">Experience Level</h3>
+                <p className="text-slate-600 leading-relaxed capitalize">
+                  {user.experience.replace("-", " ")}
                 </p>
               </div>
 
               <div className="bg-white/50 p-6 rounded-xl border border-white/60">
                 <h3 className="font-semibold text-slate-900 mb-3">Skills & Interests</h3>
                 <div className="flex flex-wrap gap-2">
-                  {profile.skills?.map((skill: string) => (
-                    <Badge key={skill} variant="secondary" className="px-3 py-1 bg-indigo-50 text-indigo-700 hover:bg-indigo-100">
-                      {skill}
-                    </Badge>
-                  ))}
+                  {skills.length > 0 ? (
+                    skills.map((skill: string) => (
+                      <Badge key={skill} variant="secondary" className="px-3 py-1 bg-indigo-50 text-indigo-700 hover:bg-indigo-100">
+                        {skill}
+                      </Badge>
+                    ))
+                  ) : (
+                    <p className="text-slate-500 text-sm">No skills added yet</p>
+                  )}
                 </div>
               </div>
-            </div>
-
-            <div className="pt-6 border-t border-slate-200/60">
-              <Button variant="ghost" className="text-red-500 hover:text-red-600 hover:bg-red-50" onClick={handleLogout}>
-                <LogOut className="h-4 w-4 mr-2" />
-                Sign Out
-              </Button>
             </div>
           </div>
         </div>

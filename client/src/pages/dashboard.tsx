@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import { generateCareerPaths, CareerPath } from "@/lib/mock-ai";
 import { motion } from "framer-motion";
 import { 
@@ -32,32 +33,29 @@ import {
 } from "@/components/ui/accordion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function Dashboard() {
-  const [profile, setProfile] = useState<any>(null);
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    const saved = localStorage.getItem("userProfile");
-    if (saved) {
-      setProfile(JSON.parse(saved));
-    }
-  }, []);
+  // Transform user data for career path generation
+  const profile = user ? {
+    name: user.name,
+    skills: typeof user.skills === "string" 
+      ? user.skills.split(",").map(s => s.trim()).filter(Boolean)
+      : [],
+    experience: user.experience,
+  } : null;
 
   const { data: paths, isLoading } = useQuery({
-    queryKey: ["careerPaths", profile],
+    queryKey: ["careerPaths", user?.id],
     queryFn: () => generateCareerPaths(profile || { name: "User", skills: [], interests: [] }),
     enabled: !!profile,
   });
 
-  if (!profile) {
-    return (
-      <div className="flex h-[80vh] items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold mb-4">No Profile Found</h2>
-          <Button asChild><a href="/onboarding">Create Profile</a></Button>
-        </div>
-      </div>
-    );
+  if (!user) {
+    return null; // ProtectedRoute will handle redirect
   }
 
   if (isLoading) {
@@ -76,10 +74,10 @@ export default function Dashboard() {
     <div className="container mx-auto px-4 py-8 max-w-7xl">
       <div className="mb-8">
         <h1 className="text-3xl font-display font-bold text-slate-900">
-          Hello, <span className="text-primary">{profile.name}</span>
+          Hello, <span className="text-primary">{user.name}</span>
         </h1>
         <p className="text-slate-500 mt-2">
-          Based on your skills in <span className="font-medium text-slate-700">{profile.skills.join(", ")}</span>, 
+          Based on your skills in <span className="font-medium text-slate-700">{profile?.skills.join(", ")}</span>, 
           we've identified {paths?.length} high-potential career paths.
         </p>
       </div>
@@ -101,15 +99,23 @@ export default function Dashboard() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="p-4 bg-white/50 rounded-lg border border-white/60">
-                  <p className="text-sm font-medium text-slate-900 mb-1">Top Skill in Demand</p>
-                  <p className="text-2xl font-bold text-indigo-600">AI Ethics</p>
-                  <p className="text-xs text-slate-500 mt-1">+140% growth YoY</p>
-                </div>
-                <div className="p-4 bg-white/50 rounded-lg border border-white/60">
-                  <p className="text-sm font-medium text-slate-900 mb-1">Your Competitive Edge</p>
-                  <p className="text-sm text-slate-600">Your combination of {profile.skills[0]} and {profile.skills[1] || "Technology"} is rare in the current market.</p>
-                </div>
+                {isLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <Loader2 className="h-8 w-8 animate-spin text-indigo-500" />
+                  </div>
+                ) : paths && paths.length > 0 && profile?.skills.length ? (
+                  <>
+                    <div className="p-4 bg-white/50 rounded-lg border border-white/60">
+                      <p className="text-sm font-medium text-slate-900 mb-1">Top Role Recommendation</p>
+                      <p className="text-2xl font-bold text-indigo-600">{paths[0].title}</p>
+                      <p className="text-xs text-slate-500 mt-1">{paths[0].growthOutlook} growth outlook</p>
+                    </div>
+                    <div className="p-4 bg-white/50 rounded-lg border border-white/60">
+                      <p className="text-sm font-medium text-slate-900 mb-1">Your Competitive Edge</p>
+                      <p className="text-sm text-slate-600">Your combination of {profile.skills[0]} and {profile.skills[1] || "Technology"} is rare in the current market.</p>
+                    </div>
+                  </>
+                ) : null}
               </CardContent>
             </Card>
           </div>

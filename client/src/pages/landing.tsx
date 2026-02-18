@@ -36,15 +36,15 @@ export default function Landing() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
-              <Link href="/onboarding">
+              <Link href="/signup">
                 <Button size="lg" className="h-14 px-8 text-lg rounded-xl bg-primary hover:bg-primary/90 shadow-lg shadow-indigo-500/20 group">
                   Start Your Journey
                   <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
-              <Link href="/onboarding">
+              <Link href="/signin">
                 <Button size="lg" variant="outline" className="h-14 px-8 text-lg rounded-xl glass-card hover:bg-white/80">
-                  View Demo
+                  Sign In
                 </Button>
               </Link>
             </div>

@@ -1,5 +1,6 @@
 import { type User, type InsertUser } from "@shared/schema";
 import { randomUUID } from "crypto";
+import bcrypt from "bcryptjs";
 
 // modify the interface with any CRUD methods
 // you might need
@@ -29,7 +30,13 @@ export class MemStorage implements IStorage {
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = randomUUID();
-    const user: User = { ...insertUser, id };
+    // Hash the password before storing
+    const hashedPassword = await bcrypt.hash(insertUser.password, 10);
+    const user: User = { 
+      ...insertUser, 
+      id,
+      password: hashedPassword,
+    };
     this.users.set(id, user);
     return user;
   }

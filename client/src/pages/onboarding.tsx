@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -26,6 +26,7 @@ export default function Onboarding() {
   const [, setLocation] = useLocation();
   const [step, setStep] = useState(1);
   const [currentSkill, setCurrentSkill] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -35,6 +36,24 @@ export default function Onboarding() {
       skills: [],
     },
   });
+
+  // Load existing profile data if available
+  useEffect(() => {
+    const saved = localStorage.getItem("userProfile");
+    if (saved) {
+      try {
+        const profile = JSON.parse(saved);
+        setIsEditing(true);
+        form.reset({
+          name: profile.name || "",
+          experience: profile.experience || "",
+          skills: profile.skills || [],
+        });
+      } catch (error) {
+        console.error("Failed to load profile:", error);
+      }
+    }
+  }, [form]);
 
   const skills = form.watch("skills");
 
@@ -211,7 +230,7 @@ export default function Onboarding() {
                         Back
                       </Button>
                       <Button type="submit" className="w-2/3 h-12 text-lg rounded-xl bg-gradient-to-r from-indigo-600 to-sky-500 hover:opacity-90">
-                        Generate Path <SparklesIcon className="ml-2 w-5 h-5" />
+                        {isEditing ? "Update Profile" : "Generate Path"} <SparklesIcon className="ml-2 w-5 h-5" />
                       </Button>
                     </div>
                   </motion.div>

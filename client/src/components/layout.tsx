@@ -1,12 +1,34 @@
 import { Link, useLocation } from "wouter";
-import { Sparkles, Compass, User, Menu } from "lucide-react";
+import { Sparkles, Compass, User, Menu, LogOut } from "lucide-react";
 import { useState } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/use-auth";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  const [location] = useLocation();
+  const [location, navigate] = useLocation();
   const [isOpen, setIsOpen] = useState(false);
+  const { isAuthenticated, signout, user } = useAuth();
+  const { toast } = useToast();
+
+  const handleSignout = async () => {
+    try {
+      await signout();
+      toast({
+        title: "Signed out successfully",
+        description: "See you next time!",
+      });
+      navigate("/");
+      setIsOpen(false);
+    } catch (error) {
+      toast({
+        title: "Error signing out",
+        description: "Please try again",
+        variant: "destructive",
+      });
+    }
+  };
 
   const NavContent = () => (
     <>
@@ -23,25 +45,52 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             Home
           </a>
         </Link>
-        <Link href="/dashboard">
-          <a className={`text-sm font-medium transition-colors hover:text-primary ${location === "/dashboard" ? "text-primary" : "text-muted-foreground"}`}>
-            Dashboard
-          </a>
-        </Link>
-        <Link href="/profile">
-          <a className={`text-sm font-medium transition-colors hover:text-primary ${location === "/profile" ? "text-primary" : "text-muted-foreground"}`}>
-            Profile
-          </a>
-        </Link>
+        {isAuthenticated && (
+          <>
+            <Link href="/dashboard">
+              <a className={`text-sm font-medium transition-colors hover:text-primary ${location === "/dashboard" ? "text-primary" : "text-muted-foreground"}`}>
+                Dashboard
+              </a>
+            </Link>
+            <Link href="/profile">
+              <a className={`text-sm font-medium transition-colors hover:text-primary ${location === "/profile" ? "text-primary" : "text-muted-foreground"}`}>
+                Profile
+              </a>
+            </Link>
+          </>
+        )}
       </nav>
 
-      <div className="hidden md:flex ml-6 gap-2">
-        <Link href="/onboarding">
-          <Button variant="outline" className="glass-card hover:bg-white/90">Sign In</Button>
-        </Link>
-        <Link href="/onboarding">
-          <Button className="bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20">Get Started</Button>
-        </Link>
+      <div className="flex flex-col md:flex-row ml-0 md:ml-6 gap-2 mt-6 md:mt-0">
+        {isAuthenticated ? (
+          <>
+            <div className="hidden md:flex items-center gap-3 mr-2 px-3 py-2 rounded-lg glass-card">
+              <User className="h-4 w-4 text-primary" />
+              <span className="text-sm font-medium">{user?.name}</span>
+            </div>
+            <Button 
+              variant="outline" 
+              className="glass-card hover:bg-white/90"
+              onClick={handleSignout}
+            >
+              <LogOut className="h-4 w-4 mr-2" />
+              Sign Out
+            </Button>
+          </>
+        ) : (
+          <>
+            <Link href="/signin">
+              <Button variant="outline" className="glass-card hover:bg-white/90 w-full md:w-auto">
+                Sign In
+              </Button>
+            </Link>
+            <Link href="/signup">
+              <Button className="bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20 w-full md:w-auto">
+                Get Started
+              </Button>
+            </Link>
+          </>
+        )}
       </div>
     </>
   );
