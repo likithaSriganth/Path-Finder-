@@ -1,8 +1,8 @@
-# 🧭 Career Compass AI
+# 🧭 Path-Finder AI
 
 > AI-powered career path recommendation platform with explainable intelligence
 
-Career Compass AI is a modern web application that helps users discover personalized career paths based on their skills and interests. Using explainable AI, it provides transparent recommendations with detailed roadmaps, skill gap analysis, and curated learning resources.
+Path-Finder AI is a modern web application that helps users discover personalized career paths based on their skills and interests. Using explainable AI, it provides transparent recommendations with detailed roadmaps, skill gap analysis, and curated learning resources.
 
 ![Tech Stack](https://img.shields.io/badge/React-19-61dafb?logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.6-3178c6?logo=typescript)
@@ -130,7 +130,7 @@ NODE_ENV=development
 ## 📁 Project Structure
 
 ```
-Career-Compass-AI/
+Path-Finder AI/
 ├── client/                    # Frontend React application
 │   ├── public/               # Static assets (favicon, images)
 │   └── src/
